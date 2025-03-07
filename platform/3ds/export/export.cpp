@@ -11,7 +11,7 @@
 static const char *dkp_path_var = "/opt/devkitpro";
 static const char *mkromfs3ds_path = "/tools/bin/mkromfs3ds";
 static const char *smdhtool_path = "/tools/bin/smdhtool";
-static const char *threedsxtool_path = "/tools/bin/smdhtool";
+static const char *threedsxtool_path = "/tools/bin/3dsxtool";
 
 class EditorExportPlatform3DS : public EditorExportPlatformConsole {
     OBJ_TYPE(EditorExportPlatform3DS, EditorExportPlatformConsole);
@@ -116,12 +116,12 @@ bool EditorExportPlatform3DS::can_export(String *r_error) const {
 
 	String exe_path = EditorSettings::get_singleton()->get_settings_path()+"/templates/";
 
-	bool debug_found = FileAccess::exists(exe_path + "godot_3ds.3ds.opt.tools.32");
-	bool release_found = FileAccess::exists(exe_path + "godot_3ds.3ds.opt.32");
+	bool debug_found = FileAccess::exists(exe_path + "godot_3ds.3ds.opt.tools.32.elf");
+	bool release_found = FileAccess::exists(exe_path + "godot_3ds.elf");
 
 	if (not debug_found and not release_found) {
 		valid=false;
-		err +="No export templates found.\nDownload and install export templates.\n";
+		err +="No export templates found.\nDownload and install export templates.\nIf you believe export templates are installed, please ensure they end in .elf.\n";
 	} else if (not debug_found){
 		err += "No debug export template found.\n";
 	} else if(not release_found){
@@ -255,9 +255,12 @@ Error EditorExportPlatform3DS::export_project(const String& p_path,bool p_debug,
 
 	// Make 3dsx
 
-	String exe_path = EditorSettings::get_singleton()->get_settings_path()+"/templates/";
 
-	args.push_back(exe_path + "godot_3ds.3ds.opt.32");
+	// I don't think 3dsxtool will work if it's not a .elf file, so some renaming will need to be done. Maybe we could automate this
+
+	String exe_path = EditorSettings::get_singleton()->get_settings_path();
+
+	args.push_back(exe_path + "/templates/godot_3ds.elf");
 
 	args.push_back(p_path); //[game].3dsx
 
@@ -265,6 +268,9 @@ Error EditorExportPlatform3DS::export_project(const String& p_path,bool p_debug,
 
 	if (run_err or retcode != 0){
 		print_line("Error in running 3dsxtool: " + String::num(retcode));
+
+		print_line(args[0]);
+		print_line(args[1]);
 
 		return ERR_CANT_CREATE;
 	}
