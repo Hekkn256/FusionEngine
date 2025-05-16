@@ -8,6 +8,7 @@
 #include "core/os/dir_access.h"
 #include "core/globals.h"
 
+
 static const char *dkp_path_var = getenv("DEVKITPRO");
 static const char *mkromfs3ds_path = "/tools/bin/mkromfs3ds";
 static const char *smdhtool_path = "/tools/bin/smdhtool";
@@ -47,6 +48,7 @@ public:
 
 void EditorExportPlatform3DS::_get_property_list( List<PropertyInfo> *p_list) const{
 	p_list->push_back(PropertyInfo(Variant::BOOL, "data/embed_pck"));
+
 	p_list->push_back(PropertyInfo(Variant::STRING, "data/author"));
 	p_list->push_back(PropertyInfo(Variant::STRING, "data/description"));
 	p_list->push_back(PropertyInfo(Variant::STRING, "data/icon", PROPERTY_HINT_FILE, "png"));
@@ -55,12 +57,14 @@ void EditorExportPlatform3DS::_get_property_list( List<PropertyInfo> *p_list) co
 bool EditorExportPlatform3DS::_set(const StringName& p_name, const Variant& p_value){
 	if (p_name == "data/embed_pck"){
 		embed_pck = p_value;
+
 	} else if (p_name == "data/author"){
 		author_path = p_value;
 	} else if (p_name == "data/description"){
 		desc_path = p_value;
 	} else if (p_name == "data/icon"){
 		icon_path = p_value;
+
 	} else {
 		return false;
 	}
@@ -90,6 +94,7 @@ EditorExportPlatform::ImageCompression EditorExportPlatform3DS::get_image_compre
 
 bool EditorExportPlatform3DS::can_export(String *r_error) const {
 	String err = "";
+
 	String dkp_path = dkp_path_var;
 
 	bool valid = true;
@@ -122,6 +127,7 @@ bool EditorExportPlatform3DS::can_export(String *r_error) const {
 	if (not debug_found and not release_found) {
 		valid=false;
 		err +="No export templates found.\nDownload and install export templates.\nIf you believe export templates are installed, please ensure they end in .elf.\n";
+
 	} else if (not debug_found){
 		err += "No debug export template found.\n";
 	} else if(not release_found){
@@ -194,6 +200,7 @@ Error EditorExportPlatform3DS::export_project(const String& p_path,bool p_debug,
 
 	//Make fusion.smdh
 
+
 	//TODO: Expose version variable
 	//args.push_back(Globals::get_singleton()->get("0"));
 
@@ -205,8 +212,9 @@ Error EditorExportPlatform3DS::export_project(const String& p_path,bool p_debug,
 
 	args.push_back(application_name);
 
-	String application_description = Globals::get_singleton()->get("application/nintendo_3ds/description");
 
+	String application_description = Globals::get_singleton()->get("application/nintendo_3ds/description");
+  
 	if (application_description.empty()){ application_description = "An application made using the Fusion Engine."; }
 
 	args.push_back(application_description);
@@ -255,7 +263,6 @@ Error EditorExportPlatform3DS::export_project(const String& p_path,bool p_debug,
 
 	// Make 3dsx
 
-
 	// I don't think 3dsxtool will work if it's not a .elf file, so some renaming will need to be done. Maybe we could automate this
 
 	String exe_path = EditorSettings::get_singleton()->get_settings_path();
@@ -279,16 +286,19 @@ Error EditorExportPlatform3DS::export_project(const String& p_path,bool p_debug,
 };
 
 void register_3ds_exporter(){
+
 	//EDITOR_DEF(dkp_path_var, "");
 
     Ref<EditorExportPlatform3DS> exporter = memnew(EditorExportPlatform3DS);
 
 	exporter->set_name("Nintendo 3DS");
 	exporter->set_binary_extension("3dsx");
+
 	Image img(_3ds_logo);
 	Ref<ImageTexture> logo = memnew(ImageTexture);
 	logo->create_from_image(img);
 	exporter->set_logo(logo);
 
 	EditorImportExport::get_singleton()->add_export_platform(exporter);
+	*/
 }
