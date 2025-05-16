@@ -8,7 +8,7 @@
 #include "core/os/dir_access.h"
 #include "core/globals.h"
 
-static const char *dkp_path_var = "/opt/devkitpro";
+static const char *dkp_path_var = getenv("DEVKITPRO");
 static const char *mkromfs3ds_path = "/tools/bin/mkromfs3ds";
 static const char *smdhtool_path = "/tools/bin/smdhtool";
 static const char *threedsxtool_path = "/tools/bin/3dsxtool";
@@ -47,20 +47,20 @@ public:
 
 void EditorExportPlatform3DS::_get_property_list( List<PropertyInfo> *p_list) const{
 	p_list->push_back(PropertyInfo(Variant::BOOL, "data/embed_pck"));
-	p_list->push_back(PropertyInfo(Variant::STRING, "launcher/background", PROPERTY_HINT_FILE, "png"));
-	p_list->push_back(PropertyInfo(Variant::STRING, "launcher/icon", PROPERTY_HINT_FILE, "png"));
-	p_list->push_back(PropertyInfo(Variant::STRING, "launcher/sound", PROPERTY_HINT_FILE, "wav"));
+	p_list->push_back(PropertyInfo(Variant::STRING, "data/author"));
+	p_list->push_back(PropertyInfo(Variant::STRING, "data/description"));
+	p_list->push_back(PropertyInfo(Variant::STRING, "data/icon", PROPERTY_HINT_FILE, "png"));
 }
 
 bool EditorExportPlatform3DS::_set(const StringName& p_name, const Variant& p_value){
 	if (p_name == "data/embed_pck"){
 		embed_pck = p_value;
-	} else if (p_name == "launcher/background"){
-		background_path = p_value;
-	} else if (p_name == "launcher/icon"){
+	} else if (p_name == "data/author"){
+		author_path = p_value;
+	} else if (p_name == "data/description"){
+		desc_path = p_value;
+	} else if (p_name == "data/icon"){
 		icon_path = p_value;
-	} else if (p_name == "launcher/sound"){
-		sound_path = p_value;
 	} else {
 		return false;
 	}
@@ -116,8 +116,8 @@ bool EditorExportPlatform3DS::can_export(String *r_error) const {
 
 	String exe_path = EditorSettings::get_singleton()->get_settings_path()+"/templates/";
 
-	bool debug_found = FileAccess::exists(exe_path + "godot_3ds.3ds.opt.tools.32.elf");
-	bool release_found = FileAccess::exists(exe_path + "godot_3ds.elf");
+	bool debug_found = FileAccess::exists(exe_path + "fusion_engine.3ds.opt.tools.32");
+	bool release_found = FileAccess::exists(exe_path + "fusion_engine.3ds.opt.32");
 
 	if (not debug_found and not release_found) {
 		valid=false;
@@ -260,7 +260,7 @@ Error EditorExportPlatform3DS::export_project(const String& p_path,bool p_debug,
 
 	String exe_path = EditorSettings::get_singleton()->get_settings_path();
 
-	args.push_back(exe_path + "/templates/godot_3ds.elf");
+	args.push_back(exe_path + "/templates/fusion_engine.3ds.opt.32");
 
 	args.push_back(p_path); //[game].3dsx
 
